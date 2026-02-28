@@ -48,8 +48,674 @@
   </div>
 </header>
 
+<!-- ═══ WHY REACT QUERY ═══ -->
+<div class="slide reveal" id="s3" data-num="00">
+  <div class="slide-label"><span class="line"></span> Part 1</div>
+  <h2>Traditional <span class="c">useEffect</span> fetching</h2>
+  <p>Look at this implementation. What could go wrong here?</p>
+
+  <div class="terminal reveal" style="margin-top:1.5rem;">
+    <div class="terminal-chrome">
+      <div class="dots"><span></span><span></span><span></span></div>
+      <span class="file">bad-tutorial-example.tsx</span>
+    </div>
+    <pre><span class="kw">function</span> <span class="fn">PokemonCard</span>({ <span class="pr">id</span> }: { <span class="pr">id</span>: <span class="tp">number</span> }) {
+  <span class="kw">const</span> [<span class="pr">data</span>, setData] = React.<span class="fn">useState</span>(<span class="kw">null</span>);
+
+  React.<span class="fn">useEffect</span>(() =&gt; {
+    <span class="kw">async function</span> <span class="fn">run</span>() {
+      <span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">`/api/pokemon/${id}`</span>);
+      <span class="kw">const</span> json = <span class="kw">await</span> res.<span class="fn">json</span>();
+      <span class="fn">setData</span>(json);
+    }
+    <span class="fn">run</span>();
+  }, [id]);
+
+  <span class="kw">return</span> &lt;<span class="tp">pre</span>&gt;{JSON.<span class="fn">stringify</span>(data)}&lt;/<span class="tp">pre</span>&gt;;
+}</pre>
+  </div>
+
+</div>
+
+<!-- ═══ PITFALLS: LOADING + ERROR ═══ -->
+<div class="slide reveal" data-num="00.1">
+  <div class="slide-label"><span class="line"></span> Part 2</div>
+  <h2>First obvious problems</h2>
+  <p>Two issues show up immediately in production: missing loading state and missing error state.</p>
+
+  <div class="pain-grid reveal-stagger" style="margin-top:1.5rem; grid-template-columns: 1fr 1fr;">
+    <div class="pain-item">
+      <div class="pain-icon" style="color:var(--accent);">L</div>
+      <h4>No loading state</h4>
+      <p>Users stare at stale or blank UI while request is in flight. You also cannot distinguish initial load from refetch.</p>
+    </div>
+    <div class="pain-item">
+      <div class="pain-icon" style="color:var(--peach);">E</div>
+      <h4>No error state</h4>
+      <p>Failed responses have nowhere to go in UI, so failures become silent, confusing, or app-breaking.</p>
+    </div>
+  </div>
+
+  <div class="cols" style="margin-top:1.5rem;">
+    <div class="reveal">
+      <h3>What you end up adding manually</h3>
+      <div class="terminal">
+        <div class="terminal-chrome">
+          <div class="dots"><span></span><span></span><span></span></div>
+          <span class="file">manual-state-handling.tsx</span>
+        </div>
+        <pre><span class="kw">const</span> [<span class="pr">pokemon</span>, setPokemon] = useState(<span class="kw">null</span>);
+<span class="kw">const</span> [<span class="pr">isLoading</span>, setIsLoading] = useState(<span class="kw">true</span>);
+<span class="kw">const</span> [<span class="pr">error</span>, setError] = useState(<span class="kw">null</span>);
+
+useEffect(() =&gt; {
+  <span class="kw">async function</span> <span class="fn">fetchPokemon</span>() {
+    setIsLoading(<span class="kw">true</span>);
+    setError(<span class="kw">null</span>);
+    <span class="kw">try</span> {
+      <span class="kw">const</span> res = <span class="kw">await</span> fetch(url);
+      <span class="kw">if</span> (!res.ok) <span class="kw">throw new</span> Error(<span class="str">"request failed"</span>);
+      setPokemon(<span class="kw">await</span> res.json());
+    } <span class="kw">catch</span> (e) {
+      setError(e.message);
+    } <span class="kw">finally</span> {
+      setIsLoading(<span class="kw">false</span>);
+    }
+  }
+  fetchPokemon();
+}, [url]);</pre>
+      </div>
+    </div>
+
+    <div class="reveal">
+      <h3>Still not done</h3>
+      <div class="terminal">
+        <div class="terminal-chrome">
+          <div class="dots"><span></span><span></span><span></span></div>
+          <span class="file">ui-branches.tsx</span>
+        </div>
+        <pre><span class="kw">if</span> (isLoading) <span class="kw">return</span> &lt;<span class="tp">Skeleton</span> /&gt;;
+<span class="kw">if</span> (error) <span class="kw">return</span> &lt;<span class="tp">ErrorState</span> <span class="pr">message</span>={error} /&gt;;
+<span class="kw">if</span> (!pokemon) <span class="kw">return</span> &lt;<span class="tp">Empty</span> /&gt;;
+
+<span class="kw">return</span> &lt;<span class="tp">PokemonCard</span> <span class="pr">data</span>={pokemon} /&gt;;
+
+<span class="cm">// Better, but we still have one subtle async bug...</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout reveal" style="margin-top:1rem;">
+    <h4>Question</h4>
+    <p>What else can you spot?</p>
+  </div>
+</div>
+
+<!-- ═══ SUBTLE BUG: RACE CONDITION ═══ -->
+<div class="slide reveal" data-num="00.2">
+  <div class="slide-label"><span class="line"></span> Part 3</div>
+  <h2>The subtle bug: race conditions</h2>
+  <p>Even with loading and error states, fast input changes can still cause stale flashes from out-of-order responses.</p>
+
+  <div class="cols" style="margin-top:1.5rem;">
+    <div class="reveal">
+      <h3>Race condition example: Pokemon carousel</h3>
+      <div class="terminal">
+        <div class="terminal-chrome">
+          <div class="dots"><span></span><span></span><span></span></div>
+          <span class="file">PokemonCarousel.tsx</span>
+        </div>
+        <pre><span class="cm">// User toggles between id=25 and id=133 quickly</span>
+<span class="kw">const</span> [<span class="pr">id</span>, setId] = useState&lt;<span class="tp">number</span>&gt;(<span class="num">25</span>);
+<span class="kw">const</span> [<span class="pr">imageUrl</span>, setImageUrl] = useState&lt;<span class="tp">string</span> | <span class="tp">null</span>&gt;(<span class="kw">null</span>);
+
+useEffect(() =&gt; {
+  <span class="kw">async function</span> <span class="fn">load</span>() {
+    <span class="kw">const</span> res = <span class="kw">await</span> fetch(<span class="str">`/api/pokemon/${id}`</span>);
+    <span class="kw">const</span> data = <span class="kw">await</span> res.json();
+    setImageUrl(data.sprites.front_default);
+  }
+  load();
+}, [id]);</pre>
+      </div>
+    </div>
+
+    <div class="reveal">
+      <h3>What can go wrong</h3>
+      <div class="terminal">
+        <div class="terminal-chrome">
+          <div class="dots"><span></span><span></span><span></span></div>
+          <span class="file">request-order.txt</span>
+        </div>
+        <pre><span class="cm">// t0: id=25 request starts (slow network)</span>
+<span class="cm">// t1: user clicks next -> id=133 request starts</span>
+<span class="cm">// t2: id=133 resolves first -> image becomes Eevee ✓</span>
+<span class="cm">// t3: id=25 resolves later -> setImageUrl(Pikachu) ❌</span>
+
+<span class="cm">// UI now flashes stale image even though id is 133.</span>
+<span class="cm">// That's the race: late old response overwrites new state.</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="reveal" style="margin-top:1.25rem;">
+    <h3>Interactive demo: force the race condition</h3>
+    <p style="margin-top:0.6rem;">Click quickly between Pokemon. This demo intentionally does not cancel prior requests.</p>
+
+    <div class="race-demo" id="race-demo">
+      <div class="race-card" id="race-card">
+        <div class="race-meta">
+          <span class="race-label">Active id:</span>
+          <span id="race-active-id">1</span>
+        </div>
+        <img
+          id="race-image"
+          class="race-image"
+          src="https://ui.dev/images/courses/pokemon-unknown.png"
+          alt="Pokemon sprite"
+        />
+        <h4 id="race-name">Loading...</h4>
+        <p id="race-status" class="race-status">Starting request...</p>
+      </div>
+
+      <div class="race-controls">
+        <button type="button" class="race-btn" id="race-prev">&larr; Prev</button>
+        <button type="button" class="race-btn race-btn-accent" id="race-next">Next &rarr;</button>
+        <button type="button" class="race-btn" id="race-spam">Switch Fast x6</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ WHAT IS REACT QUERY ═══ -->
+<div class="slide reveal" data-num="00.5">
+  <div class="slide-label"><span class="line"></span> Part 4</div>
+  <h2>What is React Query, really?</h2>
+  <p>React Query is an <strong style="color:var(--tx);">async state manager for server state</strong>.</p>
+
+  <div class="pain-grid reveal-stagger" style="grid-template-columns: 1fr 1fr 1fr;">
+    <div class="pain-item">
+      <div class="pain-icon" style="color:var(--accent);">S</div>
+      <h4>Server state aware</h4>
+      <p>Models stale/fresh data, background refetching, retries, and synchronization after writes.</p>
+    </div>
+    <div class="pain-item">
+      <div class="pain-icon" style="color:var(--teal);">C</div>
+      <h4>Cache + dedupe</h4>
+      <p>Request results are cached by query key and shared across components, avoiding duplicate calls.</p>
+    </div>
+    <div class="pain-item">
+      <div class="pain-icon" style="color:var(--lavender);">M</div>
+      <h4>Mutation workflows</h4>
+      <p>Built-in mutation lifecycle callbacks and invalidation patterns keep UI aligned with server truth.</p>
+    </div>
+  </div>
+
+  <div class="cols" style="margin-top:1.5rem;">
+    <div class="reveal">
+      <h3>Without React Query</h3>
+      <div class="terminal">
+        <div class="terminal-chrome">
+          <div class="dots"><span></span><span></span><span></span></div>
+          <span class="file">project-page-without-rq.tsx</span>
+        </div>
+        <pre><span class="kw">function</span> <span class="fn">App</span>() {
+  <span class="kw">const</span> [<span class="pr">projectId</span>, setProjectId] = React.<span class="fn">useState</span>(<span class="str">"p_123"</span>);
+  <span class="kw">const</span> [<span class="pr">project</span>, setProject] = React.<span class="fn">useState</span>(<span class="kw">null</span>);
+  <span class="kw">const</span> [<span class="pr">isLoading</span>, setIsLoading] = React.<span class="fn">useState</span>(<span class="kw">true</span>);
+  <span class="kw">const</span> [<span class="pr">error</span>, setError] = React.<span class="fn">useState</span>(<span class="kw">null</span>);
+
+  React.<span class="fn">useEffect</span>(() =&gt; {
+    <span class="kw">let</span> ignore = <span class="kw">false</span>;
+
+    <span class="kw">const</span> <span class="fn">loadProject</span> = <span class="kw">async</span> () =&gt; {
+      setProject(<span class="kw">null</span>);
+      setIsLoading(<span class="kw">true</span>);
+      setError(<span class="kw">null</span>);
+
+      <span class="kw">try</span> {
+        <span class="kw">const</span> projectRes = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">`/api/projects/${projectId}`</span>);
+        <span class="kw">if</span> (ignore) <span class="kw">return</span>;
+        <span class="kw">if</span> (!projectRes.ok) {
+          <span class="kw">throw new</span> Error(<span class="str">"Failed to load project"</span>);
+        }
+
+        setProject(<span class="kw">await</span> projectRes.<span class="fn">json</span>());
+        setIsLoading(<span class="kw">false</span>);
+      } <span class="kw">catch</span> (e) {
+        setError(e.message);
+        setIsLoading(<span class="kw">false</span>);
+      }
+    };
+
+    loadProject();
+    <span class="kw">return</span> () =&gt; { ignore = <span class="kw">true</span>; };
+  }, [projectId]);
+
+  <span class="kw">if</span> (isLoading) <span class="kw">return</span> &lt;<span class="tp">Skeleton</span> /&gt;;
+  <span class="kw">if</span> (error) <span class="kw">return</span> &lt;<span class="tp">ErrorState</span> <span class="pr">message</span>={error} /&gt;;
+  <span class="kw">if</span> (!project) <span class="kw">return</span> &lt;<span class="tp">Empty</span> /&gt;;
+
+  <span class="kw">return</span> &lt;<span class="tp">ProjectHeader</span> <span class="pr">project</span>={project} /&gt;;
+}</pre>
+      </div>
+    </div>
+    <div class="reveal">
+      <h3>With React Query</h3>
+      <div class="terminal">
+        <div class="terminal-chrome">
+          <div class="dots"><span></span><span></span><span></span></div>
+          <span class="file">project-page-with-rq.tsx</span>
+        </div>
+        <pre><span class="kw">function</span> <span class="fn">ProjectPage</span>({ <span class="pr">projectId</span> }) {
+  <span class="kw">const</span> project = <span class="fn">useQuery</span>({
+    <span class="pr">queryKey</span>: [<span class="str">"project"</span>, projectId],
+    <span class="pr">queryFn</span>: () =&gt; <span class="fn">fetchProject</span>(projectId),
+  });
+
+  <span class="kw">if</span> (project.isPending) <span class="kw">return</span> &lt;<span class="tp">Skeleton</span> /&gt;;
+  <span class="kw">if</span> (project.error) <span class="kw">return</span> &lt;<span class="tp">ErrorState</span> /&gt;;
+  <span class="kw">if</span> (!project.data) <span class="kw">return</span> &lt;<span class="tp">Empty</span> /&gt;;
+
+  <span class="kw">return</span> &lt;<span class="tp">ProjectHeader</span> <span class="pr">project</span>={project.data} /&gt;;
+}
+
+<span class="kw">async function</span> <span class="fn">fetchProject</span>(<span class="pr">projectId</span>) {
+  <span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">`/api/projects/${projectId}`</span>);
+  <span class="kw">if</span> (!res.ok) <span class="kw">throw new</span> Error(<span class="str">"Failed to load project"</span>);
+  <span class="kw">return</span> res.<span class="fn">json</span>();
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout ok reveal" style="margin-top:1rem;">
+    <h4>Concrete payoff</h4>
+    <p>Each unique <span class="c">queryKey</span> maps to one cache entry and one <span class="c">queryFn</span> contract.
+    Same key = shared cache; different key = different cache.</p>
+  </div>
+</div>
+
+<!-- ═══ WHAT IS USEQUERY ═══ -->
+<div class="slide reveal" data-num="01.59">
+  <div class="slide-label"><span class="line"></span> Deep dive</div>
+  <h2>What is <span class="c">useQuery</span>?</h2>
+  <p>It models reads of server state. You declare a <span class="c">queryKey</span> and a <span class="c">queryFn</span>, and TanStack Query manages fetch + cache + subscriptions.</p>
+
+  <div class="cols" style="margin-top:1.5rem;">
+    <div class="reveal">
+      <h3>Minimal shape</h3>
+      <div class="terminal">
+        <div class="terminal-chrome">
+          <div class="dots"><span></span><span></span><span></span></div>
+          <span class="file">ProjectHeader.tsx</span>
+        </div>
+        <pre><span class="kw">const</span> project = <span class="fn">useQuery</span>({
+  <span class="pr">queryKey</span>: [<span class="str">"project"</span>, projectId],
+  <span class="pr">queryFn</span>: () =&gt; <span class="fn">fetchProject</span>(projectId),
+});
+
+<span class="kw">if</span> (project.isPending) <span class="kw">return</span> &lt;<span class="tp">Skeleton</span> /&gt;;
+<span class="kw">if</span> (project.error) <span class="kw">return</span> &lt;<span class="tp">ErrorState</span> /&gt;;
+
+<span class="kw">return</span> &lt;<span class="tp">ProjectHeaderView</span> <span class="pr">project</span>={project.data} /&gt;;</pre>
+      </div>
+    </div>
+
+    <div class="reveal">
+      <h3>Operational model</h3>
+      <div class="terminal">
+        <div class="terminal-chrome">
+          <div class="dots"><span></span><span></span><span></span></div>
+          <span class="file">QueryModel.txt</span>
+        </div>
+        <pre>Contract
+- queryKey identifies one cache entry
+- queryFn defines how that key is fetched
+
+Behavior
+- runs automatically when mounted
+- serves cached data for same key
+- background refetch on focus/reconnect/mount (default stale behavior)
+
+Outcome
+- multiple components with same key stay synchronized</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout reveal" style="margin-top:1rem;">
+    <h4>Bridge to next section</h4>
+    <p>If reads are cached by key, what happens after a successful write changes server data?</p>
+  </div>
+</div>
+
+<!-- ═══ TANSTACK INTERNALS ═══ -->
+<div class="slide reveal" data-num="01.5">
+  <div class="slide-label"><span class="line"></span> Deep dive</div>
+  <h2>TanStack Query internals (1/2)</h2>
+  <p>Start with the core pieces. If these are clear, the defaults and lifecycle behavior make sense.</p>
+
+  <div class="pain-grid reveal-stagger" style="grid-template-columns: 1fr 1fr 1fr;">
+    <div class="pain-item">
+      <div class="pain-icon" style="color:var(--accent);">QC</div>
+      <h4>QueryClient</h4>
+      <p>The control tower. Owns global defaults and APIs like <span class="c">invalidateQueries</span>, <span class="c">prefetchQuery</span>, and <span class="c">setQueryData</span>.</p>
+    </div>
+    <div class="pain-item">
+      <div class="pain-icon" style="color:var(--teal);">[]</div>
+      <h4>QueryCache</h4>
+      <p>The storage layer. Holds entries by <span class="c">queryKey</span> with their data, timestamps, and status state.</p>
+    </div>
+    <div class="pain-item">
+      <div class="pain-icon" style="color:var(--lavender);">obs</div>
+      <h4>Observers</h4>
+      <p>The view bindings. Every <span class="c">useQuery</span> registers an observer that subscribes to a <span class="c">queryKey</span>; cache updates push re-renders to all observers of that key.</p>
+    </div>
+  </div>
+
+  <div class="callout ok reveal" style="margin-top:1rem;">
+    <h4>How they work together</h4>
+    <p><span class="c">QueryClient</span> executes policy and commands, <span class="c">QueryCache</span> stores truth by key, observers keep UI synced to that truth.</p>
+  </div>
+</div>
+
+<!-- ═══ TANSTACK INTERNALS DEFAULTS + FLOW ═══ -->
+<div class="slide reveal" data-num="01.55">
+  <div class="slide-label"><span class="line"></span> Deep dive</div>
+  <h2>TanStack Query internals (2/2)</h2>
+  <p>Now the defaults and why they exist.</p>
+
+  <div class="callout ok reveal" style="margin-top:1.5rem;">
+    <h4>Important Defaults (official docs)</h4>
+    <p>Cached data is <span class="c">stale</span> by default. Inactive queries are garbage collected after <span class="c">5 minutes</span>.
+    Failed queries retry <span class="c">3 times</span> with exponential backoff.</p>
+  </div>
+
+  <div class="pain-grid reveal-stagger" style="margin-top:1rem; grid-template-columns: 1fr 1fr 1fr;">
+    <div class="pain-item">
+      <div class="pain-icon" style="color:var(--accent);">S</div>
+      <h4>Stale by default</h4>
+      <p>Queries refetch in the background on mount/focus/reconnect.
+      Rationale: server data can change outside your app, so freshness is safer than assuming permanence.</p>
+    </div>
+    <div class="pain-item">
+      <div class="pain-icon" style="color:var(--teal);">GC</div>
+      <h4>Inactive cache retention</h4>
+      <p>Inactive queries stay cached for 5 minutes by default.
+      Rationale: quick back/forward navigation feels instant without retaining data forever.</p>
+    </div>
+    <div class="pain-item">
+      <div class="pain-icon" style="color:var(--lavender);">R</div>
+      <h4>Retry behavior</h4>
+      <p>Failed queries retry 3 times with exponential backoff.
+      Rationale: many failures are transient network blips; retrying improves reliability without extra UI code.</p>
+    </div>
+  </div>
+
+  <h3 style="margin-top:1.5rem;">Request-to-UI flow (visual)</h3>
+  <div class="seq-diagram reveal">
+    <div class="seq-lanes">
+      <div class="seq-lane">Component A</div>
+      <div class="seq-lane">Component B</div>
+      <div class="seq-lane">QueryCache Entry</div>
+      <div class="seq-lane">QueryClient Defaults</div>
+    </div>
+    <div class="seq-flow">
+      <div class="seq-guides"><span></span><span></span><span></span><span></span></div>
+      <div class="seq-event seq-1-3">Component A -&gt; Cache: subscribe with <span class="c">["project", id]</span> (Observer A)</div>
+      <div class="seq-event seq-2-3">Component B -&gt; Cache: subscribe with <span class="c">["project", id]</span> (Observer B)</div>
+      <div class="seq-event seq-3-1">Component A &lt;-- Cache: cached snapshot / updates</div>
+      <div class="seq-event seq-3-2">Component B &lt;-- Cache: same cached snapshot / updates</div>
+      <div class="seq-event seq-4-3">Cache &lt;-- QueryClient: stale, retry, gc, refetch policy</div>
+      <div class="seq-event seq-3-3">Cache -&gt; Cache: one key, one shared entry, many observers</div>
+    </div>
+  </div>
+
+  <div class="callout reveal" style="margin-top:1rem;">
+    <h4>Key idea</h4>
+    <p>One cache entry per <span class="c">queryKey</span>, many observers, one shared source of truth.</p>
+  </div>
+</div>
+
+<!-- ═══ USEQUERY LIFECYCLE ═══ -->
+<div class="slide reveal" data-num="01.6">
+  <div class="slide-label"><span class="line"></span> Deep dive</div>
+  <h2>Lifecycle of <span class="c">useQuery</span></h2>
+  <p>High-level flow (docs model): from mount to cache reuse, refetch, and garbage collection.</p>
+
+  <div class="seq-diagram reveal" style="margin-top:1.4rem;">
+    <div class="seq-lanes">
+      <div class="seq-lane">Component</div>
+      <div class="seq-lane">QueryObserver</div>
+      <div class="seq-lane">QueryCache</div>
+      <div class="seq-lane">queryFn</div>
+    </div>
+    <div class="seq-flow">
+      <div class="seq-guides"><span></span><span></span><span></span><span></span></div>
+      <div class="seq-event seq-1-2">Component -&gt; Observer: mount <span class="c">useQuery(queryKey, queryFn)</span></div>
+      <div class="seq-event seq-2-3">Observer -&gt; Cache: lookup by <span class="c">queryKey</span></div>
+      <div class="seq-event seq-3-2">Cache --&gt; Observer: return cached snapshot (if present)</div>
+      <div class="seq-event seq-2-4">Observer -&gt; queryFn: fetch when stale or missing</div>
+      <div class="seq-event seq-4-3">Cache &lt;-- queryFn: resolve Promise and write data</div>
+      <div class="seq-event seq-3-2">Observer &lt;-- Cache: notify updated entry</div>
+      <div class="seq-event seq-2-1">Component &lt;-- Observer: re-render with fresh state</div>
+      <div class="seq-event seq-2-4">Observer -&gt; queryFn: background refetch on mount/focus/reconnect</div>
+      <div class="seq-event seq-3-3">Cache -&gt; Cache: after all subscribed components unmount (no observers), query becomes inactive and is GC'd after <span class="c">gcTime</span> (default 5m)</div>
+    </div>
+  </div>
+
+  <div class="callout ok reveal">
+    <h4>Mental model</h4>
+    <p><span class="c">queryKey</span> identifies the cache entry, <span class="c">queryFn</span> produces the data, and observers keep UI synced with that entry.</p>
+  </div>
+</div>
+
+<!-- ═══ USEQUERY LIFECYCLE ANSWER ═══ -->
+<div class="slide reveal" data-num="01.61">
+  <div class="slide-label"><span class="line"></span> Deep dive</div>
+  <h2><span class="c">useQuery</span> lifecycle after writes</h2>
+  <p>When mutations change server data, use invalidation so stale cache entries rejoin the read lifecycle and refetch.</p>
+
+  <div class="cols">
+    <div class="reveal">
+      <h3>Fix: invalidate this key on success</h3>
+      <div class="terminal">
+        <div class="terminal-chrome">
+          <div class="dots"><span></span><span></span><span></span></div>
+          <span class="file">CreateTask.tsx</span>
+        </div>
+        <pre><span class="kw">const</span> createTask = <span class="fn">useMutation</span>({
+  <span class="pr">mutationFn</span>: createTaskApi,
+  <span class="fn">onSuccess</span>: <span class="kw">async</span> (_data, <span class="pr">vars</span>) =&gt; {
+    <span class="kw">await</span> queryClient.<span class="fn">invalidateQueries</span>({
+      <span class="pr">queryKey</span>: [<span class="str">"tasks"</span>, vars.projectId],
+    });
+  },
+});
+</pre>
+      </div>
+    </div>
+
+    <div class="reveal">
+      <h3>What <span class="c">invalidateQueries</span> does</h3>
+      <div class="terminal">
+        <div class="terminal-chrome">
+          <div class="dots"><span></span><span></span><span></span></div>
+          <span class="file">CacheLifecycle.txt</span>
+        </div>
+        <pre>1) Match cache entries by <span class="c">queryKey</span> filter
+2) Mark matched entries <span class="c">stale</span>
+3) Active observers refetch in background
+
+Matching examples
+- { queryKey: ["tasks"] } =&gt; all task queries
+- { queryKey: ["tasks", projectId], exact: true } =&gt; one query
+
+Result
+- post-mutation UI converges back to server truth</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout ok reveal" style="margin-top:1rem;">
+    <h4>Rationale</h4>
+    <p>You declare which server-state slice is outdated; TanStack Query handles stale marking + refetch orchestration.</p>
+  </div>
+</div>
+
+<!-- ═══ WHAT IS USEMUTATION ═══ -->
+<div class="slide reveal" data-num="01.69">
+  <div class="slide-label"><span class="line"></span> Deep dive</div>
+  <h2>What is <span class="c">useMutation</span>?</h2>
+  <p>It models write operations (create/update/delete) and other server side-effects. Unlike <span class="c">useQuery</span>, it does not run automatically.</p>
+
+  <div class="cols" style="margin-top:1.5rem;">
+    <div class="reveal">
+      <h3>Minimal shape</h3>
+      <div class="terminal">
+        <div class="terminal-chrome">
+          <div class="dots"><span></span><span></span><span></span></div>
+          <span class="file">CreateTask.tsx</span>
+        </div>
+        <pre><span class="kw">const</span> createTask = <span class="fn">useMutation</span>({
+  <span class="pr">mutationFn</span>: createTaskApi,
+});
+
+<span class="kw">const</span> <span class="fn">onSubmit</span> = (<span class="pr">input</span>) =&gt; {
+  createTask.<span class="fn">mutate</span>(input);
+};</pre>
+      </div>
+    </div>
+
+    <div class="reveal">
+      <h3>Operational model</h3>
+      <div class="terminal">
+        <div class="terminal-chrome">
+          <div class="dots"><span></span><span></span><span></span></div>
+          <span class="file">MutationModel.txt</span>
+        </div>
+        <pre>Trigger styles
+- mutate(input): fire-and-forget callback flow
+- mutateAsync(input): Promise flow with await/try-catch
+
+States
+- idle -> pending -> success | error
+
+Key behavior
+- stores last error/data for this mutation
+- does not refetch queries by itself
+- default retry is false (unlike queries)</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout reveal" style="margin-top:1rem;">
+    <h4>Bridge to next section</h4>
+    <p>If mutations do not sync read caches automatically, how do we keep query data correct after a write?</p>
+  </div>
+</div>
+
+<!-- ═══ USEMUTATION LIFECYCLE ═══ -->
+<div class="slide reveal" data-num="01.7">
+  <div class="slide-label"><span class="line"></span> Deep dive</div>
+  <h2>Lifecycle of <span class="c">useMutation</span></h2>
+  <p>High-level flow: writes are triggered manually, then you synchronize read caches after success.</p>
+
+  <div class="seq-diagram reveal" style="margin-top:1.4rem;">
+    <div class="seq-lanes">
+      <div class="seq-lane">Component</div>
+      <div class="seq-lane">MutationObserver</div>
+      <div class="seq-lane">mutationFn</div>
+      <div class="seq-lane">QueryClient/Cache</div>
+    </div>
+    <div class="seq-flow">
+      <div class="seq-guides"><span></span><span></span><span></span><span></span></div>
+      <div class="seq-event seq-1-2">Component -&gt; MutationObserver: call <span class="c">mutate</span> / <span class="c">mutateAsync</span></div>
+      <div class="seq-event seq-2-3">MutationObserver -&gt; mutationFn: execute write request</div>
+      <div class="seq-event seq-3-2">MutationObserver &lt;-- mutationFn: resolve success or error</div>
+      <div class="seq-event seq-2-1">Component &lt;-- MutationObserver: expose <span class="c">isPending/isSuccess/isError</span></div>
+      <div class="seq-event seq-2-4">on success: invalidate related keys via <span class="c">invalidateQueries</span></div>
+      <div class="seq-event seq-2-4">or write exact next value via <span class="c">setQueryData</span></div>
+      <div class="seq-event seq-4-1">Query cache updates propagate to subscribed useQuery UIs</div>
+    </div>
+  </div>
+
+  <div class="callout reveal">
+    <h4>Question</h4>
+    <p>Should we always invalidate, or sometimes write the mutation response directly into cache?</p>
+  </div>
+</div>
+
+<!-- ═══ USEMUTATION LIFECYCLE ANSWER ═══ -->
+<div class="slide reveal" data-num="01.71">
+  <div class="slide-label"><span class="line"></span> Deep dive</div>
+  <h2>Lifecycle of <span class="c">useMutation</span> — answer</h2>
+  <p>Two valid patterns: invalidate affected queries, or update cache from mutation responses.</p>
+
+  <div class="cols">
+    <div class="reveal">
+      <h3>Pattern A: invalidations from mutations</h3>
+      <div class="terminal">
+        <div class="terminal-chrome">
+          <div class="dots"><span></span><span></span><span></span></div>
+          <span class="file">EditTask.tsx</span>
+        </div>
+        <pre><span class="kw">const</span> updateTask = <span class="fn">useMutation</span>({
+  <span class="pr">mutationFn</span>: updateTaskApi,
+  <span class="fn">onSuccess</span>: <span class="kw">async</span> (_data, <span class="pr">vars</span>) =&gt; {
+    <span class="kw">await</span> Promise.<span class="fn">all</span>([
+      queryClient.<span class="fn">invalidateQueries</span>({
+        <span class="pr">queryKey</span>: [<span class="str">"tasks"</span>, vars.projectId],
+      }),
+      queryClient.<span class="fn">invalidateQueries</span>({
+        <span class="pr">queryKey</span>: [<span class="str">"projectStats"</span>, vars.projectId],
+      }),
+    ]);
+  },
+});</pre>
+      </div>
+    </div>
+
+    <div class="reveal">
+      <h3>Pattern B: updates from mutation response</h3>
+      <div class="terminal">
+        <div class="terminal-chrome">
+          <div class="dots"><span></span><span></span><span></span></div>
+          <span class="file">EditTask.tsx</span>
+        </div>
+        <pre><span class="kw">const</span> updateTask = <span class="fn">useMutation</span>({
+  <span class="pr">mutationFn</span>: updateTaskApi,
+  <span class="fn">onSuccess</span>: (<span class="pr">updatedTask</span>, <span class="pr">vars</span>) =&gt; {
+    queryClient.<span class="fn">setQueryData</span>(
+      [<span class="str">"task"</span>, updatedTask.id],
+      updatedTask
+    );
+
+    queryClient.<span class="fn">setQueryData</span>(
+      [<span class="str">"tasks"</span>, vars.projectId],
+      (old = []) =&gt;
+        old.<span class="fn">map</span>((t) =&gt; t.id === updatedTask.id ? updatedTask : t)
+    );
+  },
+});</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout ok reveal" style="margin-top:1rem;">
+    <h4>Rule of thumb</h4>
+    <p>Invalidate when related server state is broad or hard to predict. Use <span class="c">setQueryData</span> when the response is the exact next value for a known key.</p>
+  </div>
+
+  <div class="callout reveal" style="margin-top:1rem;">
+    <h4>Audience check</h4>
+    <p>If the server applies sorting/filtering side effects after save, which pattern is safer?</p>
+  </div>
+</div>
+
 <!-- ═══ tRPC CLIENT ═══ -->
-<div class="slide reveal" id="s3" data-num="01">
+<div class="slide reveal" data-num="01">
   <div class="slide-label"><span class="line"></span> 20 min</div>
   <h2>tRPC + TanStack Query</h2>
 
@@ -68,7 +734,7 @@
           <div class="dots"><span></span><span></span><span></span></div>
           <span class="file">TaskList.tsx</span>
         </div>
-        <pre><span class="kw">import</span> { <span class="fn">api</span> } <span class="kw">from</span> <span class="str">"~/utils/api"</span>;
+        <pre><span class="kw">import</span> { <span class="fn">api</span> } <span class="kw">from</span> <span class="str">"~/trpc/react"</span>;
 
 <span class="kw">export function</span> <span class="fn">TaskList</span>() {
   <span class="kw">const</span> { <span class="pr">data</span>, <span class="pr">isLoading</span>, <span class="pr">error</span> }
@@ -411,6 +1077,80 @@ const io = new IntersectionObserver((entries) => {
   entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('vis'); });
 }, { threshold: 0.08 });
 document.querySelectorAll('.reveal, .reveal-stagger').forEach(el => io.observe(el));
+
+const demoRoot = document.getElementById('race-demo');
+if (demoRoot) {
+  let id = 1;
+  let requestCount = 0;
+
+  const activeIdEl = document.getElementById('race-active-id');
+  const imageEl = document.getElementById('race-image');
+  const nameEl = document.getElementById('race-name');
+  const statusEl = document.getElementById('race-status');
+  const prevBtn = document.getElementById('race-prev');
+  const nextBtn = document.getElementById('race-next');
+  const spamBtn = document.getElementById('race-spam');
+
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  const renderLoading = (targetId) => {
+    if (activeIdEl) activeIdEl.textContent = String(targetId);
+    if (nameEl) nameEl.textContent = 'Loading...';
+    if (statusEl) statusEl.textContent = `Fetching #${targetId}...`;
+  };
+
+  const loadPokemon = async (targetId) => {
+    requestCount += 1;
+    const reqId = requestCount;
+    renderLoading(targetId);
+
+    try {
+      const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${targetId}`);
+      if (!res.ok) throw new Error(`Request failed for #${targetId}`);
+      const json = await res.json();
+
+      // Artificial jitter to make out-of-order responses easy to observe.
+      await sleep(250 + Math.floor(Math.random() * 900));
+
+      if (imageEl) {
+        imageEl.src = json?.sprites?.front_default
+          ?? 'https://ui.dev/images/courses/pokemon-unknown.png';
+      }
+      if (nameEl) nameEl.textContent = `${json.name} (#${json.id})`;
+      if (statusEl) {
+        statusEl.textContent = `Request ${reqId} resolved. Active id is ${id}.`;
+      }
+    } catch (err) {
+      if (nameEl) nameEl.textContent = 'Oops';
+      if (statusEl) {
+        statusEl.textContent = err instanceof Error ? err.message : 'Unknown error';
+      }
+      if (imageEl) imageEl.src = 'https://ui.dev/images/courses/pokemon-unknown.png';
+    }
+  };
+
+  const setIdAndLoad = (nextId) => {
+    id = Math.max(1, nextId);
+    loadPokemon(id);
+  };
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => setIdAndLoad(id - 1));
+  }
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => setIdAndLoad(id + 1));
+  }
+  if (spamBtn) {
+    spamBtn.addEventListener('click', async () => {
+      for (let i = 0; i < 6; i += 1) {
+        setIdAndLoad(i % 2 === 0 ? id + 1 : Math.max(1, id - 1));
+        await sleep(80);
+      }
+    });
+  }
+
+  loadPokemon(id);
+}
 </script>
 
 </body>
