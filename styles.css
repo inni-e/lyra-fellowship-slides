@@ -425,6 +425,90 @@ nav {
 .slide h2 { margin-bottom: 1rem; }
 .slide > p { margin-bottom: 2.5rem; }
 
+/* ── PIE CHART ── */
+.pie-chart-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 1rem;
+}
+.pie-chart-labeled {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pie-chart-simple {
+  width: 340px;
+  height: 200px;
+}
+.pie-chart-breakdown {
+  width: 420px;
+  height: 360px;
+}
+.pie-chart {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.pie-chart.pie-chart-lg {
+  width: 280px;
+  height: 280px;
+}
+.pie-label {
+  position: absolute;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--tx-2);
+  white-space: nowrap;
+}
+/* 50/50 chart: Engineering (left half, center 3 o'clock), Communication (right half, center 9 o'clock) */
+.pie-chart-simple .pie-label-r {
+  left: calc(50% + 115px);
+  top: 50%;
+  transform: translateY(-50%);
+}
+.pie-chart-simple .pie-label-l {
+  right: calc(50% + 115px);
+  top: 50%;
+  transform: translateY(-50%);
+}
+/* Breakdown chart: labels next to each slice (clockwise from 12 o'clock) */
+.pie-chart-breakdown .pie-label-1 {
+  left: calc(50% + 155px);
+  top: 50%;
+  transform: translateY(-50%);
+}
+.pie-chart-breakdown .pie-label-2 {
+  right: calc(50% + 160px);
+  top: calc(50% + 85px);
+  transform: translateY(-50%);
+  text-align: right;
+}
+.pie-chart-breakdown .pie-label-3 {
+  right: calc(50% + 160px);
+  top: calc(50% + 25px);
+  transform: translateY(-50%);
+  text-align: right;
+}
+.pie-chart-breakdown .pie-label-4 {
+  right: calc(50% + 160px);
+  top: calc(50% - 45px);
+  transform: translateY(-50%);
+  text-align: right;
+}
+.pie-chart-breakdown .pie-label-5 {
+  left: calc(50% - 120px);
+  top: 8px;
+  transform: translateY(-50%);
+}
+.pie-chart-breakdown .pie-label-6 {
+  left: calc(50% + 85px);
+  top: 8px;
+  transform: translateY(-50%);
+}
+
 /* ── TWO-COLUMN ── */
 .cols {
   display: grid;
