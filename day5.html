@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>T3 Workshop — Day 5: Flagging Issues + Capstone Demo</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<nav>
+  <div class="logo"><b>T3</b>&thinsp;WORKSHOP</div>
+  <div class="nav-links">
+    <a href="index.html">Day 1</a>
+    <a href="day2.html">Day 2</a>
+    <a href="day3.html">Day 3</a>
+    <a href="day4.html">Day 4</a>
+    <a href="day5.html" class="active">Day 5</a>
+  </div>
+</nav>
+
+<main>
+
+<!-- ═══ HERO ═══ -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="tag"><span class="dot"></span> Session 5 &middot; Week 2</div>
+    <h1>Communicate early.<br>Flag <em>fast.</em></h1>
+    <p class="subtitle">
+      Translate for clients, escalate before you're stuck,
+      and show the product&mdash;not the code.
+    </p>
+    <div class="cta-group">
+      <a href="#s5" class="btn btn-primary">Begin Day 5 &darr;</a>
+      <a href="index.html" class="btn btn-ghost">Back to Day 1 &rarr;</a>
+    </div>
+    <div class="tech-bar">
+      <span class="tech-label">Powered by</span>
+      <div class="logos">
+        <img src="assets/prisma.svg" alt="Prisma" title="Prisma">
+        <img src="assets/trpc.png" alt="tRPC" title="tRPC" style="border-radius:50%;">
+        <img src="assets/nextjs.png" alt="Next.js" title="Next.js" style="border-radius:50%;">
+        <img src="assets/typescript.svg" alt="TypeScript" title="TypeScript">
+        <img src="assets/tailwindcss.svg" alt="Tailwind" title="Tailwind CSS">
+        <img src="assets/tanstack.png" alt="TanStack" title="TanStack Query" style="border-radius:50%;">
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ═══ TRANSLATE DON'T EDUCATE ═══ -->
+<div class="slide reveal" id="s5" data-num="01">
+  <div class="slide-label"><span class="line"></span> Client communication &middot; 20 min</div>
+  <h2>Translate, don't educate</h2>
+  <p style="margin-bottom:1.5rem;">
+    Clients need to know when their feature ships, not how tRPC works.
+    Outcome-focused communication.
+  </p>
+
+  <div class="cols reveal">
+    <div class="callout" style="margin:0;">
+      <h4>Don't say</h4>
+      <p>"I'm refactoring the tRPC router to add Zod validation on the input schema."</p>
+    </div>
+    <div class="callout ok" style="margin:0;">
+      <h4>Say instead</h4>
+      <p>"Form validation is done. Users will see clear errors when they submit invalid data."</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ STATUS UPDATES FORMULA ═══ -->
+<div class="slide reveal" data-num="02">
+  <div class="slide-label"><span class="line"></span> Status updates</div>
+  <h2>Status updates formula</h2>
+  <p style="margin-bottom:1.5rem;">
+    Executives have ~30 seconds to review. Keep it concise. Visuals over walls of text.
+  </p>
+
+  <div class="callout reveal" style="max-width:36rem;">
+    <p><strong>1. What's done</strong> — completed since last update</p>
+    <p><strong>2. What's in progress</strong> — current work</p>
+    <p><strong>3. What's blocked</strong> — issues preventing progress</p>
+    <p><strong>4. What I need from you</strong> — decisions, input, or approvals</p>
+  </div>
+
+  <div class="callout ok reveal" style="margin-top:1.5rem;">
+    <h4>Never leave them guessing</h4>
+    <p>Remind clients what you need. Blockers without "what I need from you" create silence and drift.</p>
+  </div>
+</div>
+
+<!-- ═══ DELIVERING BAD NEWS ═══ -->
+<div class="slide reveal" data-num="03">
+  <div class="slide-label"><span class="line"></span> Bad news</div>
+  <h2>Delivering bad news</h2>
+  <p style="margin-bottom:1.5rem;">
+    Framework: <strong style="color:var(--accent);">Acknowledge &rarr; Explain impact &rarr; Propose path forward</strong>.
+    Never report a problem without a recommendation.
+  </p>
+
+  <div class="pain-grid reveal-stagger" style="grid-template-columns: 1fr 1fr 1fr;">
+    <div class="pain-item">
+      <div class="pain-icon" style="color:var(--teal);">1</div>
+      <h4>Acknowledge</h4>
+      <p>Recognize how the news affects them. Put yourself in their position.</p>
+    </div>
+    <div class="pain-item">
+      <div class="pain-icon" style="color:var(--peach);">2</div>
+      <h4>Explain impact</h4>
+      <p>Be direct. What happened, why, and what it means for the timeline or scope.</p>
+    </div>
+    <div class="pain-item">
+      <div class="pain-icon" style="color:var(--accent);">3</div>
+      <h4>Propose path forward</h4>
+      <p>Focus most of the conversation on the solution, not the problem.</p>
+    </div>
+  </div>
+
+  <div class="callout warn reveal" style="margin-top:1.5rem;">
+    <h4>Rule</h4>
+    <p>Don't just dump the problem. Come with at least one concrete recommendation. That's where you regain trust.</p>
+  </div>
+</div>
+
+<!-- ═══ ASKING QUESTIONS WELL ═══ -->
+<div class="slide reveal" data-num="04">
+  <div class="slide-label"><span class="line"></span> Asking questions</div>
+  <h2>Asking questions well</h2>
+  <p style="margin-bottom:1.5rem;">
+    Vague complaints don't get answers. Specific questions do.
+  </p>
+
+  <div class="cols reveal">
+    <div class="callout" style="margin:0; border-color:rgba(255,126,179,0.3);">
+      <h4 style="color:var(--coral);">Bad</h4>
+      <p><em>"The requirements are unclear."</em></p>
+      <p style="font-size:0.9rem; color:var(--tx-3); margin-top:0.5rem;">Puts burden on them to guess what you need.</p>
+    </div>
+    <div class="callout ok" style="margin:0;">
+      <h4 style="color:var(--teal);">Good</h4>
+      <p><em>"I want to confirm: when you say X, do you mean A or B? I'm leaning toward A because [reason]."</em></p>
+      <p style="font-size:0.9rem; color:var(--tx-3); margin-top:0.5rem;">Gives them an easy yes/no.</p>
+    </div>
+  </div>
+
+  <div class="callout ok reveal" style="margin-top:1.5rem;">
+    <h4>Live exercise</h4>
+    <p>Show 2 bad status updates on screen. Rewrite them together as a group.</p>
+  </div>
+</div>
+
+<!-- ═══ DEMO SKILLS ═══ -->
+<div class="slide reveal" data-num="05">
+  <div class="slide-label"><span class="line"></span> Demo skills &middot; 10 min</div>
+  <h2>Demo skills</h2>
+  <p style="margin-bottom:1.5rem;">
+    Structure: <strong style="color:var(--accent);">Context &rarr; What you built &rarr; Show it working &rarr; What's next</strong>.
+  </p>
+
+  <div class="callout warn reveal">
+    <h4>Rule</h4>
+    <p>Show the product, not the code. Clients don't care about your router.</p>
+  </div>
+
+  <div class="assignment reveal" style="margin-top:1.5rem;">
+    <h3>// Quick practice</h3>
+    <p>Each person gives a 60-second demo of one feature to a partner. Partner gives one piece of feedback.</p>
+  </div>
+</div>
+
+<!-- ═══ 30 MINUTE RULE ═══ -->
+<div class="slide reveal" data-num="06">
+  <div class="slide-label"><span class="line"></span> Flagging issues &middot; 20 min</div>
+  <h2>The 30-minute rule</h2>
+  <p style="margin-bottom:1.5rem;">
+    Stuck with no forward progress for 30 minutes? Escalate.
+    This isn't failure&mdash;it's professional judgment.
+  </p>
+
+  <div class="callout ok reveal">
+    <h4>In consulting and small teams</h4>
+    <p>Silent struggling burns the project. Your client or lead can't help if they don't know you're stuck.</p>
+  </div>
+</div>
+
+<!-- ═══ RED FLAGS ═══ -->
+<div class="slide reveal" data-num="07">
+  <div class="slide-label"><span class="line"></span> Red flags</div>
+  <h2>Red flags to recognize</h2>
+  <p style="margin-bottom:1.5rem;">
+    Know when to escalate. These signal you're in risky territory.
+  </p>
+
+  <div class="pain-grid reveal-stagger" style="grid-template-columns: 1fr 1fr 1fr;">
+    <div class="pain-item">
+      <div class="pain-icon" style="color:var(--coral);">T</div>
+      <h4>Technical</h4>
+      <p>Vague requirements, scope creep disguised as "small changes," building something you can't explain.</p>
+    </div>
+    <div class="pain-item">
+      <div class="pain-icon" style="color:var(--peach);">P</div>
+      <h4>Process</h4>
+      <p>Client unresponsive on blocking questions, priorities shifting with no updated timeline.</p>
+    </div>
+    <div class="pain-item">
+      <div class="pain-icon" style="color:var(--lavender);">Y</div>
+      <h4>Personal</h4>
+      <p>You're guessing instead of knowing, avoiding the hard part of the ticket.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ HOW TO FLAG WELL ═══ -->
+<div class="slide reveal" data-num="08">
+  <div class="slide-label"><span class="line"></span> Escalation</div>
+  <h2>How to flag well</h2>
+  <p style="margin-bottom:1.5rem;">
+    Use this template: <span class="c">"I've identified [issue]. Impact is [X]. I recommend [Y]. I need [Z] to proceed."</span>
+  </p>
+
+  <div class="callout reveal" style="max-width:36rem;">
+    <p><strong>I've identified</strong> — the issue in one sentence</p>
+    <p><strong>Impact is</strong> — what happens if we don't fix it</p>
+    <p><strong>I recommend</strong> — your proposed solution</p>
+    <p><strong>I need from you</strong> — decision, input, or approval to proceed</p>
+  </div>
+
+  <div class="assignment reveal" style="margin-top:1.5rem;">
+    <h3>// Quick exercise</h3>
+    <p>Show 2 scenarios on screen. Each person writes an escalation message in 2 minutes. Share and critique 1&ndash;2 as a group.</p>
+  </div>
+</div>
+
+<!-- ═══ ENGINEERING JUDGMENT ═══ -->
+<div class="slide reveal" data-num="09">
+  <div class="slide-label"><span class="line"></span> Engineering judgment &middot; 10 min</div>
+  <h2>Engineering judgment, fast</h2>
+  <p style="margin-bottom:1.5rem;">
+    Build vs library. "Good enough" vs perfect. Push back vs just build it.
+  </p>
+
+  <div class="callout ok reveal" style="margin-bottom:1.5rem;">
+    <h4>The key question</h4>
+    <p>"What's the cost of being wrong?" Low cost &rarr; move fast. High cost &rarr; slow down, ask, validate.</p>
+  </div>
+
+  <div class="cols reveal">
+    <div class="callout" style="margin:0;">
+      <h4>Satisficing</h4>
+      <p>Herbert Simon: pursuing the optimal often costs more than the marginal gain. Barry Schwartz: maximizers report lower satisfaction and more regret.</p>
+    </div>
+    <div class="callout" style="margin:0;">
+      <h4>Example</h4>
+      <p>Client asks for real-time updates. WebSockets vs poll every 5 seconds? How do you decide, and how do you communicate the tradeoff?</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CLOSING ═══ -->
+<div class="slide reveal" data-num="10">
+  <div class="slide-label"><span class="line"></span> Closing &middot; 5 min</div>
+  <h2>The two things to remember</h2>
+
+  <div class="steps reveal-stagger" style="margin:2rem 0;">
+    <div class="step"><span class="step-n">1</span> The workflow</div>
+    <span class="step-arr">&rarr;</span>
+    <div class="step highlight"><span class="step-n">2</span> The mindset</div>
+  </div>
+
+  <div class="cols reveal" style="margin-top:1.5rem;">
+    <div class="callout ok" style="margin:0;">
+      <h4>Workflow</h4>
+      <p>Requirement &rarr; Schema &rarr; Backend &rarr; Frontend &rarr; Ship</p>
+    </div>
+    <div class="callout ok" style="margin:0;">
+      <h4>Mindset</h4>
+      <p>Communicate early, flag fast, own your work</p>
+    </div>
+  </div>
+
+  <blockquote class="reveal" style="margin-top:2rem;">
+    30/60/90-day growth prompt: "Where do you want to be in 30 days? What would make you confident?"
+  </blockquote>
+</div>
+
+<!-- ═══ RESOURCES ═══ -->
+<div class="slide reveal" data-num="11">
+  <div class="slide-label"><span class="line"></span> Resources</div>
+  <h2>Keep building</h2>
+
+  <div class="card-grid reveal-stagger" style="margin-top:2rem;">
+    <div class="card">
+      <h3>T3 Stack</h3>
+      <p><a href="https://create.t3.gg" target="_blank" rel="noopener">create.t3.gg</a> — docs, tutorials, community</p>
+    </div>
+    <div class="card">
+      <h3>Prisma</h3>
+      <p><a href="https://www.prisma.io/docs" target="_blank" rel="noopener">prisma.io/docs</a> — schema, queries, migrations</p>
+    </div>
+    <div class="card">
+      <h3>tRPC</h3>
+      <p><a href="https://trpc.io/docs" target="_blank" rel="noopener">trpc.io/docs</a> — routers, middleware, errors</p>
+    </div>
+    <div class="card">
+      <h3>TanStack Query</h3>
+      <p><a href="https://tanstack.com/query" target="_blank" rel="noopener">tanstack.com/query</a> — caching, mutations</p>
+    </div>
+    <div class="card">
+      <h3>Tailwind CSS</h3>
+      <p><a href="https://tailwindcss.com/docs" target="_blank" rel="noopener">tailwindcss.com/docs</a> — utilities, responsive</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ BOTTOM NAV ═══ -->
+<div class="end-slide">
+  <div class="page-nav">
+    <a href="day4.html">
+      <span class="pn-label">&larr; Previous</span>
+      <span class="pn-title">Day 4: Using AI Effectively</span>
+    </a>
+    <a href="index.html">
+      <span class="pn-label">Back to start &rarr;</span>
+      <span class="pn-title">Day 1: Schema-First</span>
+    </a>
+  </div>
+
+  <footer>
+    <div class="f-links">
+      <a href="index.html">Day 1</a>
+      <a href="day2.html">Day 2</a>
+      <a href="day3.html">Day 3</a>
+      <a href="day4.html">Day 4</a>
+      <a href="day5.html">Day 5</a>
+    </div>
+    <p>T3 Stack Workshop &mdash; Lyra Fellowship</p>
+  </footer>
+</div>
+
+</main>
+
+<script>
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('vis'); });
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal, .reveal-stagger').forEach(el => io.observe(el));
+</script>
+
+</body>
+</html>

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>T3 Workshop — Day 4: Using AI Effectively + Client Communication</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<nav>
+  <div class="logo"><b>T3</b>&thinsp;WORKSHOP</div>
+  <div class="nav-links">
+    <a href="index.html">Day 1</a>
+    <a href="day2.html">Day 2</a>
+    <a href="day3.html">Day 3</a>
+    <a href="day4.html" class="active">Day 4</a>
+    <a href="day5.html">Day 5</a>
+  </div>
+</nav>
+
+<main>
+
+<!-- ═══ HERO ═══ -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="tag"><span class="dot"></span> Session 4 &middot; Week 2</div>
+    <h1>AI as a tool.<br>Not a <em>crutch.</em></h1>
+    <p class="subtitle">
+      Use AI to ship faster without outsourcing understanding.
+      One rule: if you can't explain every line, you don't ship it.
+    </p>
+    <div class="cta-group">
+      <a href="#s4" class="btn btn-primary">Begin Day 4 &darr;</a>
+      <a href="day5.html" class="btn btn-ghost">Skip to Day 5 &rarr;</a>
+    </div>
+    <div class="tech-bar">
+      <span class="tech-label">Powered by</span>
+      <div class="logos">
+        <img src="assets/prisma.svg" alt="Prisma" title="Prisma">
+        <img src="assets/trpc.png" alt="tRPC" title="tRPC" style="border-radius:50%;">
+        <img src="assets/nextjs.png" alt="Next.js" title="Next.js" style="border-radius:50%;">
+        <img src="assets/typescript.svg" alt="TypeScript" title="TypeScript">
+        <img src="assets/tailwindcss.svg" alt="Tailwind" title="Tailwind CSS">
+        <img src="assets/tanstack.png" alt="TanStack" title="TanStack Query" style="border-radius:50%;">
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ═══ THE RULE ═══ -->
+<div class="slide reveal" id="s4" data-num="01">
+  <div class="slide-label"><span class="line"></span> AI as a tool &middot; 20 min</div>
+  <h2>The rule: explain every line</h2>
+  <p style="margin-bottom:1.5rem;">
+    If you can't explain every line of AI-generated code, you don't ship it.
+    You own the code, not the AI.
+  </p>
+
+  <blockquote class="reveal" style="margin-bottom:1.5rem;">
+    "Treat AI-generated code as a draft that requires human review and understanding."
+    <cite style="display:block; margin-top:0.5rem; font-size:0.9rem;">— Addy Osmani</cite>
+  </blockquote>
+
+  <div class="pain-grid reveal-stagger" style="grid-template-columns: 1fr 1fr;">
+    <div class="pain-item">
+      <div class="pain-icon" style="color:var(--coral);">1.7&times;</div>
+      <h4>Measured risk</h4>
+      <p>PRs containing AI-authored code had 1.7x more issues than human-only PRs. Review isn't optional.</p>
+    </div>
+    <div class="pain-item">
+      <div class="pain-icon" style="color:var(--teal);">&#10003;</div>
+      <h4>What you gain</h4>
+      <p>Accountability, preserved skills, fewer hidden defects, and less team friction when you own every line.</p>
+    </div>
+  </div>
+
+  <div class="callout warn reveal" style="margin-top:1.5rem;">
+    <h4>When you skip review</h4>
+    <p>Lost accountability, eroded skills, hidden defects that cost 30&ndash;100&times; more to fix in production,
+    and reviewers catching issues you should have found. Your job shifts from writing code to integrating it.</p>
+  </div>
+</div>
+
+<!-- ═══ FOUR AI WORKFLOWS ═══ -->
+<div class="slide reveal" data-num="02">
+  <div class="slide-label"><span class="line"></span> Live demo</div>
+  <h2>Four AI workflows (tRPC project)</h2>
+  <p style="margin-bottom:1.5rem;">
+    Use these four workflows on your T3 project. Each has a clear input and output.
+  </p>
+
+  <div class="pain-grid reveal-stagger" style="grid-template-columns: 1fr 1fr;">
+    <div class="pain-item">
+      <div class="pain-icon" style="color:var(--accent);">1</div>
+      <h4>Comprehension</h4>
+      <p>Paste unfamiliar tRPC middleware. Ask: <span class="c">"Explain this in plain English"</span>. Use to onboard to existing patterns.</p>
+    </div>
+    <div class="pain-item">
+      <div class="pain-icon" style="color:var(--teal);">2</div>
+      <h4>Debugging</h4>
+      <p>Structured prompt: error message + what you tried + context. Get targeted help instead of generic fixes.</p>
+    </div>
+    <div class="pain-item">
+      <div class="pain-icon" style="color:var(--lavender);">3</div>
+      <h4>Boilerplate</h4>
+      <p><span class="c">"Generate a Zod schema for a user profile form with these fields"</span> &rarr; review and adjust. Don't hand-edit blindly.</p>
+    </div>
+    <div class="pain-item">
+      <div class="pain-icon" style="color:var(--peach);">4</div>
+      <h4>Design rubber-ducking</h4>
+      <p><span class="c">"I need tagging on tasks. Separate table or JSON field? Here's my schema."</span> Discuss tradeoffs before coding.</p>
+    </div>
+  </div>
+
+  <div class="cols reveal" style="margin-top:1.5rem;">
+    <div class="callout" style="margin:0;">
+      <h4>Live demo</h4>
+      <p>Run through all four workflows on your T3 project during the session.</p>
+    </div>
+    <div class="callout ok" style="margin:0;">
+      <h4>Rubber-duck rule</h4>
+      <p>Design prompts are for thinking out loud. Don't implement until you understand the tradeoffs.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ THE PROMPTING FORMULA ═══ -->
+<div class="slide reveal" data-num="03">
+  <div class="slide-label"><span class="line"></span> Prompting</div>
+  <h2>The prompting formula</h2>
+  <p style="margin-bottom:1.5rem;">
+    <strong style="color:var(--accent);">Context + Constraint + Specific Ask</strong>.
+    61% of developers struggle with AI code quality due to insufficient context&mdash;not model limits.
+  </p>
+
+  <div class="cols reveal">
+    <div class="callout" style="margin:0; border-color:rgba(255,126,179,0.3);">
+      <h4 style="color:var(--coral);">Bad</h4>
+      <p><em>"fix my code"</em></p>
+      <p style="font-size:0.9rem; color:var(--tx-3); margin-top:0.5rem;">No context. No error. No behavior. AI guesses.</p>
+    </div>
+    <div class="callout ok" style="margin:0;">
+      <h4 style="color:var(--teal);">Good</h4>
+      <p><em>"Here's my tRPC router [paste]. The create mutation throws [error] when I send [input]. I expect [behavior]. What's wrong?"</em></p>
+      <p style="font-size:0.9rem; color:var(--tx-3); margin-top:0.5rem;">Context + constraint + specific ask.</p>
+    </div>
+  </div>
+
+  <div class="callout ok reveal" style="margin-top:1.5rem;">
+    <h4>Research insight</h4>
+    <p>Context improves code generation more than role-playing personas. Treat AI like a colleague who needs onboarding to your codebase.</p>
+  </div>
+</div>
+
+<!-- ═══ WHEN NOT TO USE AI ═══ -->
+<div class="slide reveal" data-num="04">
+  <div class="slide-label"><span class="line"></span> Boundaries</div>
+  <h2>When <em>not</em> to use AI</h2>
+  <p style="margin-bottom:1.5rem;">
+    AI is a tool. Some situations require human judgment and full understanding.
+  </p>
+
+  <div class="pain-grid reveal-stagger" style="grid-template-columns: 1fr 1fr 1fr;">
+    <div class="pain-item">
+      <div class="pain-icon" style="color:var(--coral);">&times;</div>
+      <h4>Architectural decisions</h4>
+      <p>Don't use AI for decisions you don't understand yet. Learn first, then decide.</p>
+    </div>
+    <div class="pain-item">
+      <div class="pain-icon" style="color:var(--coral);">&times;</div>
+      <h4>Security-sensitive code</h4>
+      <p>Auth, tokens, encryption. If it guards user data, you must own every line.</p>
+    </div>
+    <div class="pain-item">
+      <div class="pain-icon" style="color:var(--coral);">&times;</div>
+      <h4>Tempted to skip understanding</h4>
+      <p>If your instinct is to paste and hope, stop. That's when you need to slow down.</p>
+    </div>
+  </div>
+
+  <blockquote class="reveal" style="margin-top:1.5rem;">
+    Never outsource the reading. Hold AI-written code to the same standards as human teammates.
+  </blockquote>
+</div>
+
+<!-- ═══ CLAUDE MAXXING ═══ -->
+<div class="slide reveal" data-num="05">
+  <div class="slide-label"><span class="line"></span> Maximising AI usage &middot; 35 min</div>
+  <h2>Claude Maxxing</h2>
+  <p style="margin-bottom:1.5rem;">
+    Skills, MCPs, context engineering, and autonomous loops. Get the most out of Claude Code.
+  </p>
+
+  <div class="callout ok reveal" style="margin-bottom:1.5rem;">
+    <h4>Explore</h4>
+    <p><a href="https://claudemaxxing.org" target="_blank" rel="noopener">claudemaxxing.org</a> &mdash; Skills, MCPs, CoVe (Chain-of-Verification), Ralph Loop, GSD (Get Shit Done).</p>
+  </div>
+
+  <div class="pain-grid reveal-stagger" style="grid-template-columns: 1fr 1fr;">
+    <div class="pain-item">
+      <div class="pain-icon" style="color:var(--accent);">CoVe</div>
+      <h4>Chain-of-Verification</h4>
+      <p>Create &rarr; Outline &rarr; Verify &rarr; Emit. Claude tests its own code against docs and codebase.</p>
+    </div>
+    <div class="pain-item">
+      <div class="pain-icon" style="color:var(--teal);">GSD</div>
+      <h4>Get Shit Done</h4>
+      <p>Discuss, plan, execute, verify. State in files, not context. Fresh 200K windows per task.</p>
+    </div>
+  </div>
+
+  <blockquote class="reveal" style="margin-top:1.5rem;">
+    "Give me six hours to implement a feature and I will spend the first four writing the prompt."
+    <cite style="display:block; margin-top:0.5rem; font-size:0.9rem;">— adapted from Eisenhower</cite>
+  </blockquote>
+</div>
+
+<!-- ═══ BOTTOM NAV ═══ -->
+<div class="end-slide">
+  <div class="page-nav">
+    <a href="day3.html">
+      <span class="pn-label">&larr; Previous</span>
+      <span class="pn-title">Day 3: Frontend + Full Loop</span>
+    </a>
+    <a href="day5.html">
+      <span class="pn-label">Next &rarr;</span>
+      <span class="pn-title">Day 5: Flagging Issues + Capstone Demo</span>
+    </a>
+  </div>
+
+  <footer>
+    <div class="f-links">
+      <a href="index.html">Day 1</a>
+      <a href="day2.html">Day 2</a>
+      <a href="day3.html">Day 3</a>
+      <a href="day4.html">Day 4</a>
+      <a href="day5.html">Day 5</a>
+    </div>
+    <p>T3 Stack Workshop &mdash; Lyra Fellowship</p>
+  </footer>
+</div>
+
+</main>
+
+<script>
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('vis'); });
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal, .reveal-stagger').forEach(el => io.observe(el));
+</script>
+
+</body>
+</html>
